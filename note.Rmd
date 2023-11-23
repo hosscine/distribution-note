@@ -1,0 +1,89 @@
+---
+title: "Distribution Note"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+# 離散
+
+## 幾何分布
+
+単調減少する。
+
+確率probのベルヌイ試行をしたとき何回目で初めて成功するか。
+
+probが小さいほど裾が長い。
+
+```{r}
+x <- rgeom(100, prob = 0.3)
+
+print(mean(x))
+hist(x)
+```
+
+
+平均はprobに反比例する。
+
+```{r}
+prob <- seq(0.1, 0.7, by = 0.1)
+xlist <- map(prob, ~ rgeom(100, .))
+
+tibble(prob = prob, mean = map_dbl(xlist, mean))
+```
+
+
+## ポワソン分布
+
+平均lambdaの分布。一応分散もlambda。
+
+平均lambdaで離散の正規分布みたいなイメージ。
+
+上限は厳密にはないが、lambdaのだいたい倍ぐらい。
+
+平均してlambda回発生する事象がk回発生する確率に相当する。
+
+```{r}
+x <- rpois(100, lambda = 3)
+
+print(mean(x))
+hist(x)
+```
+
+# 連続
+
+## ワイブル分布
+
+平均はscale弱ぐらい(0.9かけぐらい)。下限は0。
+scaleが大きくても小さくても平均の傾向は変わらない。
+
+裾が垂れる方向はshapeで制御できる。
+
+だいたいshape3で左右対称系だが、scaleが大きい(5ぐらい)と裾が左に長く、scaleが小さい(1,2ぐらい)と右に長い。
+
+総じて裾の偏りを制御できる正規分布っぽい。
+
+```{r}
+x <- rweibull(1000, shape = 5, scale = 50)
+
+mean(x)
+hist(x)
+```
+
+```{r}
+x <- rweibull(1000, shape = 2, scale = 50)
+
+mean(x)
+hist(x)
+```
+
+```{r}
+scale <- 10 ^ (-2:5)
+xlist <- map(scale, ~ rweibull(1000, 3, .))
+
+tibble(scale = scale, mean = num(map_dbl(xlist, mean), notation = "si"))
+```
+

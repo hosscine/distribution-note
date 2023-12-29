@@ -5,6 +5,7 @@ output: html_notebook
 
 ```{r}
 library(tidyverse)
+set.seed(255)
 ```
 
 
@@ -85,5 +86,26 @@ scale <- 10 ^ (-2:5)
 xlist <- map(scale, ~ rweibull(1000, 3, .))
 
 tibble(scale = scale, mean = num(map_dbl(xlist, mean), notation = "si"))
+```
+
+## ベータ分布
+
+0から1までの値をとる分布。
+
+shape1とshape2の二つのパラメータはそれぞれ左右の裾の重さと対応する。
+shapeが1以下の場合は単調減少(shape1)または単調増加(shape2)となる。
+shape1と2が等しい場合は左右対称になる。
+
+```{r}
+x <- seq(0, 1, by = 0.01)
+shape1 <- c(0.8, 1:5)
+X <- expand_grid(x, shape1) %>% 
+  filter(x > 0) %>% 
+  group_by(shape1) %>% 
+  mutate(y = dbeta(x, shape1, shape2 = 2))
+
+ggplot(X, aes(x, y, color = factor(shape1))) +
+  geom_line() +
+  labs(title = "fixed shape2 = 2")
 ```
 

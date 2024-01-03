@@ -1,6 +1,10 @@
 ---
 title: "Distribution Note"
-output: html_notebook
+output: 
+  html_notebook:
+    toc: yes
+    toc_float: yes
+    toc_collapsed: no
 ---
 
 ```{r}
@@ -94,18 +98,30 @@ tibble(scale = scale, mean = num(map_dbl(xlist, mean), notation = "si"))
 
 shape1とshape2の二つのパラメータはそれぞれ左右の裾の重さと対応する。
 shapeが1以下の場合は単調減少(shape1)または単調増加(shape2)となる。
+
 shape1と2が等しい場合は左右対称になる。
+この場合shapeが大きいほど尖度が高くなる。
 
 ```{r}
 x <- seq(0, 1, by = 0.01)
 shape1 <- c(0.8, 1:5)
 X <- expand_grid(x, shape1) %>% 
   filter(x > 0) %>% 
-  group_by(shape1) %>% 
   mutate(y = dbeta(x, shape1, shape2 = 2))
 
 ggplot(X, aes(x, y, color = factor(shape1))) +
   geom_line() +
   labs(title = "fixed shape2 = 2")
+```
+
+```{r}
+x <- seq(0, 1, by = 0.01)
+shape <- c(0.5, 0.8, 1:3, 10)
+X <- expand_grid(x, shape) %>% 
+  mutate(y = dbeta(x, shape1 = shape, shape2 = shape))
+
+ggplot(X, aes(x, y, color = factor(shape))) +
+  geom_line() +
+  labs(title = "shape1 = shape2")
 ```
 
